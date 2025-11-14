@@ -55,7 +55,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ value = '#ff0000', onChange, 
   const [tintPreviewPct, setTintPreviewPct] = useState<number | null>(null);
   const [selectedColor, setSelectedColor] = useLocalStorage<Color>(STORAGE_SELECTED, DEFAULT_COLOR);
   const [savedColors, setSavedColors] = useLocalStorage<SavedColor[]>(STORAGE_KEY, DEFAULT_COLORS);
-  const currentRgb = useMemo(() => hexToRgb(editingValue.Value), [editingValue]);
+  const currentRgb = useMemo(() => hexToRgb(editingValue?.Value), [editingValue]);
   const itemsCount = savedColors.length + 1; // saved + custom
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
@@ -74,12 +74,15 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ value = '#ff0000', onChange, 
       const c = savedColors.find((s) => s.Id === id)!;
       setOpenEditId(id);
       setEditingName(c.Name);
-      // setEditingValue(c.Value);
+      setEditingValue(c);
       setEditingFormat('hex');
     } else {
       setOpenEditId("new");
       setEditingName('');
-      // setEditingValue('#000000');
+      setEditingValue({
+        Name: "Black",
+        Value: "#000000"
+      });
       setEditingFormat('hex');
     }
   };
@@ -142,6 +145,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ value = '#ff0000', onChange, 
   };
 
   const handleRgbChange = (k: 'r' | 'g' | 'b', v: number) => {
+    debugger;
     const next = { ...currentRgb, [k]: Math.max(0, Math.min(255, Math.round(v))) };
     setEditingValue(rgbToHex(next.r, next.g, next.b));
   };
@@ -171,8 +175,8 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ value = '#ff0000', onChange, 
     <div className="rcp-root">
       <div className="rcp-select" tabIndex={0} onBlur={() => setDropdownOpen(false)}>
         <button className="rcp-toggle" onClick={() => setDropdownOpen((s) => !s)} onKeyDown={onToggleKeyDown} aria-haspopup="menu" aria-expanded={dropdownOpen}>
-          <span className="rcp-swatch" style={{ background: selectedColor }} aria-hidden />
-          <span className="rcp-name">{savedColors.find(s => s.Value === selectedColor)?.Name ?? selectedColor}</span>
+          <span className="rcp-swatch" style={{ background: selectedColor?.Value }} aria-hidden />
+          <span className="rcp-name">{savedColors.find(s => s.Value === selectedColor.Value)?.Name ?? selectedColor?.Value}</span>
           <span className="rcp-caret">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="6 9 12 15 18 9"></polyline>
@@ -186,7 +190,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ value = '#ff0000', onChange, 
                 <SavedItem
                   key={c.Id}
                   c={c}
-                  onSelect={(v) => { handleSelect(v); setDropdownOpen(false); }}
+                  onSelect={() => { handleSelect({ Name: c.Name, Value: c.Value }); setDropdownOpen(false); }}
                   onEdit={(id) => { openEditor(id); setDropdownOpen(false); }}
                   onDelete={(id) => { handleDelete(id); setDropdownOpen(false); }}
                   close={() => setDropdownOpen(false)} />

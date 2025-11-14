@@ -6,10 +6,13 @@ export type ColorModalProps = {
   openEditId: string | null;
   editingFormat: 'hex' | 'rgb' | 'hsl' | 'tint';
   editingName: string;
-  editingValue: string;
+  editingValue: {
+    Name: string,
+    Value: string,
+  };
   tintPreviewPct: number | null;
   onChangeName: (s: string) => void;
-  onChangeValue: (s: string) => void;
+  onChangeValue: (s: { Name: string, Value: string }) => void;
   onChangeFormat: (f: 'hex' | 'rgb' | 'hsl' | 'tint') => void;
   onChangeTintPct: (p: number | null) => void;
   onRgbChange: (k: 'r' | 'g' | 'b', v: number) => void;
@@ -19,8 +22,9 @@ export type ColorModalProps = {
 
 // Field and NumberField imported from shared primitives
 export default function ColorModal(props: ColorModalProps) {
+  console.log("props ::: ", props.editingValue);
   const { openEditId, editingFormat, editingName, editingValue, tintPreviewPct, onChangeName, onChangeValue, onChangeFormat, onChangeTintPct, onRgbChange, onSave, onClose } = props;
-  const currentRgb = useMemo(() => hexToRgb(editingValue), [editingValue]);
+  const currentRgb = useMemo(() => hexToRgb(editingValue?.Value), [editingValue]);
   if (!openEditId) return null;
   return (
     <div className="rcp-modal">
@@ -42,7 +46,7 @@ export default function ColorModal(props: ColorModalProps) {
 
         {editingFormat === 'hex' && (
           <Field label="Hex">
-            <input value={editingValue} onChange={(e) => onChangeValue(e.target.value)} />
+            <input value={editingValue.Value} onChange={(e) => onChangeValue(e)} />
           </Field>
         )}
 
@@ -51,7 +55,7 @@ export default function ColorModal(props: ColorModalProps) {
             <Field label="R"><NumberField value={currentRgb.r} onChange={(v) => onRgbChange('r', v)} /></Field>
             <Field label="G"><NumberField value={currentRgb.g} onChange={(v) => onRgbChange('g', v)} /></Field>
             <Field label="B"><NumberField value={currentRgb.b} onChange={(v) => onRgbChange('b', v)} /></Field>
-            <div className="rcp-preview" style={{ background: editingValue }} aria-hidden />
+            <div className="rcp-preview" style={{ background: editingValue.Value }} aria-hidden />
           </div>
         )}
 
@@ -62,7 +66,7 @@ export default function ColorModal(props: ColorModalProps) {
               <Field label="H"><NumberField value={hsl.h} onChange={(v) => { const { r, g, b } = hslToRgb(v, hsl.s, hsl.l); onChangeValue(rgbToHex(r, g, b)); }} min={0} max={360} /></Field>
               <Field label="S"><NumberField value={hsl.s} onChange={(v) => { const { r, g, b } = hslToRgb(hsl.h, v, hsl.l); onChangeValue(rgbToHex(r, g, b)); }} min={0} max={100} /></Field>
               <Field label="L"><NumberField value={hsl.l} onChange={(v) => { const { r, g, b } = hslToRgb(hsl.h, hsl.s, v); onChangeValue(rgbToHex(r, g, b)); }} min={0} max={100} /></Field>
-              <div className="rcp-preview" style={{ background: editingValue }} aria-hidden />
+              <div className="rcp-preview" style={{ background: editingValue.Value }} aria-hidden />
             </div>
           );
         })()}
@@ -75,7 +79,7 @@ export default function ColorModal(props: ColorModalProps) {
                 <input type="number" min={0} max={100} value={tintPreviewPct ?? 0} onChange={(e) => onChangeTintPct(Number(e.target.value))} style={{ width: 64 }} />
               </div>
             </Field>
-            <div className="rcp-preview" style={{ background: tintPreviewPct != null ? tintHex(editingValue, tintPreviewPct) : editingValue }} aria-hidden />
+            <div className="rcp-preview" style={{ background: tintPreviewPct != null ? tintHex(editingValue.Value, tintPreviewPct) : editingValue.Value }} aria-hidden />
           </div>
         )}
 

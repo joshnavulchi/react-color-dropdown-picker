@@ -2,7 +2,7 @@ export type RGB = { r: number; g: number; b: number };
 export type HSL = { h: number; s: number; l: number };
 
 export const hexToRgb = (hex: string): RGB => {
-  const h = hex.replace('#', '');
+  const h = hex?.replace('#', '');
   const bigint = parseInt(h, 16);
   const r = (bigint >> 16) & 255;
   const g = (bigint >> 8) & 255;
@@ -63,12 +63,12 @@ export const tintHex = (hex: string, pct: number) => {
 
 export const hexToCMYK = (hex: string): { c: number; m: number; y: number; k: number } => {
   // Remove '#' if present
-  hex = hex.replace(/^#/, '');
+  hex = hex?.replace(/^#/, '');
 
   // Parse RGB values
-  const r = parseInt(hex.substring(0, 2), 16);
-  const g = parseInt(hex.substring(2, 4), 16);
-  const b = parseInt(hex.substring(4, 6), 16);
+  const r = parseInt(hex?.substring(0, 2), 16);
+  const g = parseInt(hex?.substring(2, 4), 16);
+  const b = parseInt(hex?.substring(4, 6), 16);
 
   // Convert to CMYK
   const c = 1 - (r / 255);
